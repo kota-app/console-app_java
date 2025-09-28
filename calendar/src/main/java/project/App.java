@@ -1,12 +1,9 @@
 package project;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 import java.util.Scanner;
-
-import org.fusesource.jansi.Ansi.Erase;
 import org.fusesource.jansi.AnsiConsole;
 import static org.fusesource.jansi.Ansi.*;
-import static org.fusesource.jansi.Ansi.Color.*;
 
 public class App {
   public static void main(String[] args) {
@@ -20,7 +17,7 @@ public class App {
     System.out.print("月を入力してください：");
     int month = sc.nextInt();
 
-    // 対象月のカレンダー情報を出力
+    // 指定された年月の月のカレンダーを表示
     printCalender(year, month);
 
     AnsiConsole.systemUninstall();
@@ -34,24 +31,17 @@ public class App {
    * @param month 表示するカレンダーの月
    */
   public static void printCalender(int year, int month) {
-    // カレンダーを作成
-    Calendar calendar = createCalender(year, month);
-
-    // DAY_OF_WEEKの値に対応する曜日の文字列
-    String[] week = { "日", "月", "火", "水", "木", "金", "土" };
-
+    LocalDate firstDay = LocalDate.of(year, month, 1);
     // 月の日数を取得
-    int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-
-    // 月の最初の曜日を取得
-    int firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+    int lengthOfMonth = firstDay.lengthOfMonth();
+    // 月の最初の曜日を取得（日=0、月=1）
+    int firstDayOfWeek = firstDay.getDayOfWeek().getValue() % 7;
 
     // タイトルを出力
-    System.out.println(
-        calendar.get(Calendar.YEAR) + "年" +
-            (calendar.get(Calendar.MONTH) + 1) + "月のカレンダー");
+    System.out.println(year + "年" + month + "月のカレンダー");
 
-    // 曜日を出力
+    // 曜日のヘッダーを出力
+    String[] week = { "日", "月", "火", "水", "木", "金", "土" };
     for (String day : week) {
       System.out.print(day + "\t");
     }
@@ -63,36 +53,23 @@ public class App {
     }
 
     // 日付を出力
-    for (int day = 1; day <= lastDay; day++) {
+    for (int day = 1; day <= lengthOfMonth; day++) {
       // 曜日を取得
-      int weekNumber = day + firstDayOfWeek;
+      int dayOfWeek = (day + firstDayOfWeek) % 7;
 
       // 日付を出力
-      if (weekNumber % 7 == 0) {
-        // 土曜の場合は青色＆改行
+      if (dayOfWeek == 0) {
+        // 土曜日の場合は青色で表示し、改行する
         System.out.print(ansi().fgBlue().a(day + "\t").reset());
         System.out.println();
-      } else if (weekNumber % 7 == 1) {
-        // 日曜の場合は赤色
+      } else if (dayOfWeek == 1) {
+        // 日曜日の場合は赤色で表示
         System.out.print(ansi().fgRed().a(day + "\t").reset());
       } else {
+        // それ以外の場合は白色表示
         System.out.print(day + "\t");
       }
     }
-  }
-
-  /**
-   * 指定された年月に設定したCalendarインスタンスを返します。
-   * 
-   * @param year  設定に使う年
-   * @param month 設定に使う月
-   * @return 指定した年月で設定されたCalendarインスタンス
-   */
-  public static Calendar createCalender(int year, int month) {
-    Calendar calendar = Calendar.getInstance();
-    // 月は0始まりのため-1する
-    calendar.set(year, month - 1, 1);
-    return calendar;
   }
 
 }
