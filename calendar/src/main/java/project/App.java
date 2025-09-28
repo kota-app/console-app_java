@@ -2,6 +2,8 @@ package project;
 
 import java.time.LocalDate;
 import java.util.Scanner;
+
+import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 import static org.fusesource.jansi.Ansi.*;
 
@@ -52,22 +54,35 @@ public class App {
       System.out.print("\t");
     }
 
+    // 現在日時を取得
+    LocalDate today = LocalDate.now();
+
     // 日付を出力
     for (int day = 1; day <= lengthOfMonth; day++) {
       // 曜日を取得
       int dayOfWeek = (day + firstDayOfWeek) % 7;
 
-      // 日付を出力
+      // 日付の文字装飾を設定
+      Ansi line = ansi();
       if (dayOfWeek == 0) {
-        // 土曜日の場合は青色で表示し、改行する
-        System.out.print(ansi().fgBlue().a(day + "\t").reset());
-        System.out.println();
+        // 土曜日の場合は青色
+        line.fgBlue();
       } else if (dayOfWeek == 1) {
-        // 日曜日の場合は赤色で表示
-        System.out.print(ansi().fgRed().a(day + "\t").reset());
-      } else {
-        // それ以外の場合は白色表示
-        System.out.print(day + "\t");
+        // 日曜日の場合は赤色
+        line.fgRed();
+      }
+      // 今日の場合は背景色を緑色に設定
+      LocalDate currentDay = LocalDate.of(year, month, day);
+      if (currentDay.equals(today)) {
+        line.bgGreen();
+      }
+
+      // 日付を出力
+      System.out.print(line.a(day + "\t").reset());
+
+      // 土曜日の場合は改行
+      if (dayOfWeek == 0) {
+        System.out.println();
       }
     }
   }
