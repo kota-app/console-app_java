@@ -1,6 +1,7 @@
 package calendar;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.fusesource.jansi.Ansi;
@@ -19,8 +20,11 @@ public class App {
     System.out.print("月を入力してください：");
     int month = sc.nextInt();
 
+    // 祝日を取得
+    Map<LocalDate, String> holidays = HolidaysApi.getHolidaysApi(year);
+
     // 指定された年月の月のカレンダーを表示
-    printCalender(year, month);
+    printCalender(year, month, holidays);
 
     AnsiConsole.systemUninstall();
     sc.close();
@@ -29,10 +33,11 @@ public class App {
   /**
    * 指定された年月の月のカレンダーを表示します。
    * 
-   * @param year  表示するカレンダーの年
-   * @param month 表示するカレンダーの月
+   * @param year     表示するカレンダーの年
+   * @param month    表示するカレンダーの月
+   * @param holidays 指定された年の祝日と祝日名が格納されたMap
    */
-  public static void printCalender(int year, int month) {
+  public static void printCalender(int year, int month, Map<LocalDate, String> holidays) {
     LocalDate firstDay = LocalDate.of(year, month, 1);
     // 月の日数を取得
     int lengthOfMonth = firstDay.lengthOfMonth();
@@ -59,6 +64,9 @@ public class App {
 
     // 日付を出力
     for (int day = 1; day <= lengthOfMonth; day++) {
+      // LocalDate型に変換
+      LocalDate currentDay = LocalDate.of(year, month, day);
+
       // 曜日を取得
       int dayOfWeek = (day + firstDayOfWeek) % 7;
 
@@ -67,12 +75,11 @@ public class App {
       if (dayOfWeek == 0) {
         // 土曜日の場合は青色
         line.fgBlue();
-      } else if (dayOfWeek == 1) {
-        // 日曜日の場合は赤色
+      } else if (dayOfWeek == 1 || holidays.containsKey(currentDay)) {
+        // 日曜日または祝日の場合は赤色
         line.fgRed();
       }
       // 今日の場合は背景色を緑色に設定
-      LocalDate currentDay = LocalDate.of(year, month, day);
       if (currentDay.equals(today)) {
         line.bgGreen();
       }
