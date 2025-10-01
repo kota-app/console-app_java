@@ -1,4 +1,4 @@
-package project;
+package calendar;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

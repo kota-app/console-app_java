@@ -1,4 +1,4 @@
-package project;
+package calendar;
 
 import java.time.LocalDate;
 import java.util.Scanner;
